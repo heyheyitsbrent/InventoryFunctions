@@ -45,7 +45,6 @@ namespace GetInventoryApi
             logger.LogInformation("Adding new item to inventory.");
 
             var itemJson = await new StreamReader(req.Body).ReadToEndAsync();
-
             var item = JsonConvert.DeserializeObject<Item>(itemJson);
             item.Id = Guid.NewGuid().ToString();
 
@@ -66,7 +65,6 @@ namespace GetInventoryApi
             logger.LogInformation("Updating item in inventory.");
 
             var itemJson = await new StreamReader(req.Body).ReadToEndAsync();
-
             var item = JsonConvert.DeserializeObject<Item>(itemJson);
 
             await dbService.UpdateItemAsync(item);

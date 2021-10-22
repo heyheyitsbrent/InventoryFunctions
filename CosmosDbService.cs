@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GetInventoryApi.Models;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace GetInventoryApi
 {
@@ -19,12 +21,16 @@ namespace GetInventoryApi
     {
         private Container _container;
 
-        public CosmosDbService(
-            CosmosClient dbClient,
-            string databaseName,
-            string containerName)
+        public CosmosDbService(IConfiguration configuration)
         {
+            var connectionStr = configuration.GetConnectionString("Cosmos");
+            var logger = LoggerFactory.Create(bldr => bldr.AddConsole()).CreateLogger<CosmosDbService>();
+            logger.LogInformation("Creating client with string: " + connectionStr);
+            var databaseName = "Inventory";
+            var containerName = "Items";
+            var dbClient = new CosmosClient(connectionStr);
             this._container = dbClient.GetContainer(databaseName, containerName);
+            logger.LogInformation("Created");
         }
 
         public async Task AddItemAsync(Item item) => await this._container.CreateItemAsync<Item>(item, new PartitionKey(item.Id));
